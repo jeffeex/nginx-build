@@ -22,7 +22,7 @@ jobs:
       - env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
-          echo "$env:MSYS2_LOCATION"
+          echo "$MSYS2_LOCATION"
           ls "D:\a\_temp\msys64"
       - name: Download and extract Nginx source
         run: |
@@ -87,9 +87,8 @@ jobs:
             --with-stream_ssl_preread_module \
             --with-http_dav_module
           make -j4
-          cp objs/nginx.exe ../
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
         with:
           name: nginx-v1.26.3
-          path: nginx.exe
+          path: D:\a\nginx-build\nginx-build\nginx\objs\nginx.exe
