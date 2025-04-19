@@ -18,7 +18,29 @@ jobs:
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-make
       - shell: msys2 {0}
-        env:
-          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           echo "$env:MSYS2_LOCATION"
+          ls "$env:MSYS2_LOCATION"
+      - name: Download and extract Nginx source
+        shell: cmd
+        run: |
+          msys2 -mingw64 -c "
+            wget https://nginx.org/download/nginx-1.25.3.tar.gz
+            tar -xzf nginx-1.25.3.tar.gz
+            cd nginx-1.25.3
+          "
+      - name: Configure and build Nginx
+        shell: cmd
+        run: |
+          msys2 -mingw64 -c "
+            cd nginx-1.25.3
+            ./configure \
+              --prefix=/mingw64/nginx \
+              --with-http_ssl_module \
+              --with-pcre=/mingw64/include \
+              --with-zlib=/mingw64/include \
+              --with-openssl=/mingw64/include \
+              --with-cc-opt='-static'
+            make -j4
+            make install
+          "
