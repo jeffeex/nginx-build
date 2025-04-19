@@ -28,6 +28,7 @@ jobs:
             wget https://nginx.org/download/nginx-1.25.3.tar.gz
             tar -xzf nginx-1.25.3.tar.gz
             cd nginx-1.25.3
+            ls -al
           "
       - name: Configure and build Nginx
         shell: cmd
@@ -44,3 +45,8 @@ jobs:
             make -j4
             make install
           "
+      - name: Upload compiled binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: nginx-windows-bin
+          path: D:\a\_temp\msys64\mingw64\nginx
