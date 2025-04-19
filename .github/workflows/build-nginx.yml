@@ -3,9 +3,6 @@ on: [push]
 jobs:
   build:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,4 +19,5 @@ jobs:
             mingw-w64-x86_64-make
         env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        shell: msys2 {0}
         run: echo "$env:MSYS2_LOCATION"
