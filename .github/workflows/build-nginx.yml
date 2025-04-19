@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - env:
-        MSYS2_LOCATION: C:\msys64
       - name: Setup MSYS2 environment
         uses: msys2/setup-msys2@v2
         with:
@@ -22,3 +20,6 @@ jobs:
             mingw-w64-x86_64-pcre
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-make
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: echo "$env:MSYS2_LOCATION"
