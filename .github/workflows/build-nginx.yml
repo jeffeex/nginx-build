@@ -20,7 +20,7 @@ jobs:
       - shell: msys2 {0}
         run: |
           echo "$env:MSYS2_LOCATION"
-          ls "$env:MSYS2_LOCATION"
+          ls "D:\a\_temp\msys64"
       - name: Download and extract Nginx source
         shell: cmd
         run: |
