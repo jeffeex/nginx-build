@@ -24,7 +24,7 @@ jobs:
       - name: Download and extract Nginx source
         shell: cmd
         run: |
-          msys2 -mingw64 -c "
+          msys2 -c "
             wget https://nginx.org/download/nginx-1.25.3.tar.gz
             tar -xzf nginx-1.25.3.tar.gz
             cd nginx-1.25.3
@@ -32,7 +32,7 @@ jobs:
       - name: Configure and build Nginx
         shell: cmd
         run: |
-          msys2 -mingw64 -c "
+          msys2 -c "
             cd nginx-1.25.3
             ./configure \
               --prefix=/mingw64/nginx \
