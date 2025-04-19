@@ -3,34 +3,33 @@ on: [push]
 jobs:
   build:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup MSYS2 environment
+      - name: Setup MSYS2
+        id: msys2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: ucrt64
           install: >-
             git
             make
-            mingw-w64-x86_64-toolchain
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-zlib
-            mingw-w64-x86_64-pcre
-            mingw-w64-x86_64-openssl
-            mingw-w64-x86_64-make
-      - shell: msys2 {0}
+      - env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
         run: |
           echo "$env:MSYS2_LOCATION"
           ls "D:\a\_temp\msys64"
       - name: Download and extract Nginx source
-        shell: msys2 {0}
         run: |
           ls -al
           pwd
-          wget https://nginx.org/download/nginx-1.25.3.tar.gz
-          tar -xzf nginx-1.25.3.tar.gz
-          cd nginx-1.25.3
+          wget https://nginx.org/download/nginx-1.26.3.tar.gz
+          tar -xzf nginx-1.26.3.tar.gz
+          mv nginx-1.26.3 nginx
+          cd nginx
           mkdir lib
           cd lib 
           wget https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz
@@ -46,7 +45,7 @@ jobs:
         run: |
           ls -al
           pwd
-          cd nginx-1.25.3
+          cd nginx
           pwd
           ./configure \
             --prefix= \
@@ -85,9 +84,10 @@ jobs:
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             --with-http_dav_module
-          make -j32
+          make -j4
+          cp objs/nginx.exe ../
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
         with:
-          name: nginx-windows-bin
-          path: D:\a\nginx-build\nginx-build\nginx-1.25.3\objs\nginx.exe
+          name: nginx-v1.26.3
+          path: nginx.exe
