@@ -44,8 +44,8 @@ jobs:
             --with-zlib=/mingw64/include \
             --with-openssl=/mingw64/include \
             --with-cc-opt='-static'
-          /mingw64/bin/make -j4
-          /mingw64/bin/make install
+          make -j32
+          make install
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
         with:
