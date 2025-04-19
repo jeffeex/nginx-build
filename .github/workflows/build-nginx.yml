@@ -46,7 +46,7 @@ jobs:
             make install
           "
       - name: Upload compiled binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nginx-windows-bin
           path: D:\a\_temp\msys64\mingw64\nginx
