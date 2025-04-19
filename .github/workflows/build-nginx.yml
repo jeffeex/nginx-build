@@ -22,14 +22,14 @@ jobs:
           echo "$env:MSYS2_LOCATION"
           ls "D:\a\_temp\msys64"
       - name: Download and extract Nginx source
-      - shell: msys2 {0}
+        shell: msys2 {0}
         run: |
           wget https://nginx.org/download/nginx-1.25.3.tar.gz
           tar -xzf nginx-1.25.3.tar.gz
           cd nginx-1.25.3
           ls -al
       - name: Configure and build Nginx
-      - shell: msys2 {0}
+        shell: msys2 {0}
         run: |
           cd nginx-1.25.3
           ./configure \
