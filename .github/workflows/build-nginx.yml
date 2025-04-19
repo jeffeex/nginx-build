@@ -17,7 +17,8 @@ jobs:
             mingw-w64-x86_64-pcre
             mingw-w64-x86_64-openssl
             mingw-w64-x86_64-make
-        env:
+      - env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
-        shell: msys2 {0}
-        run: echo "$env:MSYS2_LOCATION"
+      - shell: msys2 {0}
+        run: |
+          echo "$env:MSYS2_LOCATION"
