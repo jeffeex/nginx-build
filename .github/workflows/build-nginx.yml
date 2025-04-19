@@ -26,26 +26,35 @@ jobs:
       - name: Download and extract Nginx source
         shell: msys2 {0}
         run: |
+          ls -al
+          pwd
           wget https://nginx.org/download/nginx-1.25.3.tar.gz
           tar -xzf nginx-1.25.3.tar.gz
           cd nginx-1.25.3
+          mkdir lib
+          cd lib 
+          wget https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz
+          tar -xzvf openssl-3.5.0.tar.gz
+          wget https://zlib.net/zlib-1.3.1.tar.gz
+          tar -xzvf zlib-1.3.1.tar.gz
+          wget -O pcre-8.45.tar.gz https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.tar.gz/download
+          tar -xzvf pcre-8.45.tar.gz
           ls -al
           pwd
       - name: Configure and build Nginx
         shell: msys2 {0}
         run: |
+          ls -al
           pwd
           cd nginx-1.25.3
           pwd
           ./configure \
             --prefix=/mingw64/nginx \
             --with-http_ssl_module \
-            --with-pcre=/mingw64/include \
-            --with-zlib=/mingw64/include \
-            --with-openssl=/mingw64/include \
-            --with-cc-opt='-static'
+            --with-pcre=lib/pcre-8.45 \
+            --with-zlib=lib/zlib-1.3.1 \
+            --with-openssl=lib/openssl-3.5.0
           make -j32
-          make install
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
         with:
