@@ -22,8 +22,6 @@ jobs:
             mingw-w64-ucrt-x86_64-libxslt
       - name: Prepare source code
         run: |
-          ls -al
-          pwd
           wget https://nginx.org/download/nginx-1.26.3.tar.gz
           tar -xzf nginx-1.26.3.tar.gz
           mv nginx-1.26.3 nginx
@@ -41,12 +39,12 @@ jobs:
           mkdir module
           cd module
           git clone https://github.com/arut/nginx-dav-ext-module.git
-          ls -al
-          ls -al /ucrt64/include/
-          ls -al /ucrt64/lib
+          echo "TIMESTAMP=$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
       - name: Configure and build Nginx
         shell: msys2 {0}
         run: |
+          echo "$TIMESTAMP"
+          echo "$GITHUB_WORKSPACE"
           ls -al
           pwd
           cd nginx
@@ -67,7 +65,7 @@ jobs:
             --with-pcre=lib/pcre-8.45 \
             --with-zlib=lib/zlib-1.3.1 \
             --with-openssl=lib/openssl-3.5.0 \
-            --with-openssl-opt='no-asm no-tests -D_WIN32_WINNT=0x0601' \
+            --with-openssl-opt='no-asm no-tests -D_WIN32_WINNT=0x0601 -DOPENSSL_NO_BCRYPT=0' \
             --with-http_ssl_module \
             --with-http_v2_module \
             --with-http_realip_module \
@@ -89,7 +87,7 @@ jobs:
             --with-stream_ssl_preread_module \
             --with-http_dav_module \
             --add-module=module/nginx-dav-ext-module
-          make -j4
+          make -j8
           ldd objs/nginx.exe
           cd ..
           mkdir release
@@ -100,8 +98,6 @@ jobs:
           cp /ucrt64/bin/zlib1.dll release
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
-        env:
-          TIMESTAMP: $(date -u +'%Y%m%d%H%M%S')
         with:
           name: nginx.1.26.3.${{ env.TIMESTAMP }}
           path: D:\a\nginx-build\nginx-build\release
