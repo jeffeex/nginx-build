@@ -13,7 +13,8 @@ jobs:
         id: msys2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: ucrt64
+          msystem: UCRT64
+          update: true
           install: >-
             git
             make
@@ -22,33 +23,46 @@ jobs:
             mingw-w64-ucrt-x86_64-libxslt
       - name: Prepare source code
         run: |
+          echo "::group::Prepare nginx source code"
           wget https://nginx.org/download/nginx-1.26.3.tar.gz
           tar -xzf nginx-1.26.3.tar.gz
           mv nginx-1.26.3 nginx
+          mkdir -p nginx/lib nginx/module
+          echo "::endgroup::"
+
+          echo "::group::Modify nginx source code for compile module nginx-dav-ext"
           cp -f nginx.auto.lib.libxslt.conf nginx/auto/lib/libxslt/conf
-          cd nginx
-          mkdir lib
-          cd lib 
+          echo "::endgroup::"
+
+          echo "::group::Prepare openssl source code"
+          cd nginx/lib
           wget https://github.com/openssl/openssl/releases/download/openssl-3.5.0/openssl-3.5.0.tar.gz
           tar -xzvf openssl-3.5.0.tar.gz
+          echo "::endgroup::"
+
+          echo "::group::Prepare zlib source code"
           wget https://zlib.net/zlib-1.3.1.tar.gz
           tar -xzvf zlib-1.3.1.tar.gz
+          echo "::endgroup::"
+          
+          echo "::group::Prepare pcre source code"
           wget -O pcre-8.45.tar.gz https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.tar.gz/download
           tar -xzvf pcre-8.45.tar.gz
-          cd ..
-          mkdir module
-          cd module
+          echo "::endgroup::"
+          
+          echo "::group::Prepare nginx-dav-ext source code"
+          cd ../module
           git clone https://github.com/arut/nginx-dav-ext-module.git
+          echo "::endgroup::"
+
+          echo "::group::Setup enviroment"
           echo "TIMESTAMP=$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-      - name: Configure and build Nginx
-        shell: msys2 {0}
+          echo "::endgroup::"
+      - name: Configure and build
         run: |
-          echo "$TIMESTAMP"
-          echo "$GITHUB_WORKSPACE"
-          ls -al
-          pwd
+        
+          echo "::group::Configure"
           cd nginx
-          pwd
           ./configure \
             --prefix= \
             --conf-path=conf/nginx.conf \
@@ -65,7 +79,7 @@ jobs:
             --with-pcre=lib/pcre-8.45 \
             --with-zlib=lib/zlib-1.3.1 \
             --with-openssl=lib/openssl-3.5.0 \
-            --with-openssl-opt='no-asm no-tests -D_WIN32_WINNT=0x0601 -DOPENSSL_NO_BCRYPT=0' \
+            --with-openssl-opt='no-asm no-tests -D_WIN32_WINNT=0x0601' \
             --with-http_ssl_module \
             --with-http_v2_module \
             --with-http_realip_module \
@@ -87,8 +101,13 @@ jobs:
             --with-stream_ssl_preread_module \
             --with-http_dav_module \
             --add-module=module/nginx-dav-ext-module
-          make -j8
-          ldd objs/nginx.exe
+          echo "::endgroup::"
+
+          echo "::group::Make"
+          make -j16
+          echo "::endgroup::"
+
+          echo "::group::Prepare release"
           cd ..
           mkdir release
           cp nginx/objs/nginx.exe release
@@ -96,8 +115,9 @@ jobs:
           cp /ucrt64/bin/liblzma-5.dll release
           cp /ucrt64/bin/libiconv-2.dll release
           cp /ucrt64/bin/zlib1.dll release
+          echo "::endgroup::"
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
         with:
           name: nginx.1.26.3.${{ env.TIMESTAMP }}
-          path: D:\a\nginx-build\nginx-build\release
+          path: ${{ env.GITHUB_WORKSPACE }}\release
