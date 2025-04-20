@@ -20,7 +20,7 @@ jobs:
             mingw-w64-ucrt-x86_64-toolchain
             mingw-w64-ucrt-x86_64-libxml2
             mingw-w64-ucrt-x86_64-libxslt
-      - name: Download and extract Nginx source and other source 
+      - name: Prepare source code
         run: |
           ls -al
           pwd
@@ -91,8 +91,17 @@ jobs:
             --add-module=module/nginx-dav-ext-module
           make -j4
           ldd objs/nginx.exe
+          cd ..
+          mkdir release
+          cp nginx/objs/nginx.exe release
+          cp /ucrt64/bin/libxml2-2.dll release
+          cp /ucrt64/bin/liblzma-5.dll release
+          cp /ucrt64/bin/libiconv-2.dll release
+          cp /ucrt64/bin/zlib1.dll release
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
+        env:
+          TIMESTAMP: $(date -u +'%Y%m%d%H%M%S')
         with:
-          name: nginx-v1.26.3
-          path: D:\a\nginx-build\nginx-build\nginx\objs\nginx.exe
+          name: nginx.1.26.3.${{ env.TIMESTAMP }}
+          path: D:\a\nginx-build\nginx-build\release
