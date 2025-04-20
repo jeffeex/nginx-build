@@ -41,6 +41,7 @@ jobs:
           mkdir module
           cd module
           git clone https://github.com/arut/nginx-dav-ext-module.git
+          ls -al
       - name: Configure and build Nginx
         shell: msys2 {0}
         run: |
@@ -49,7 +50,7 @@ jobs:
           cd nginx
           pwd
           ./configure \
-            --with-ld-opt="-Wl,-Bstatic -lxslt -lxml2 -lz -llzma -liconv -Wl,-Bdynamic" \
+            --with-ld-opt="-L/ucrt64/lib -Wl,-Bstatic -lxslt -lxml2 -lz -llzma -liconv -Wl,-Bdynamic" \
             --prefix= \
             --conf-path=conf/nginx.conf \
             --pid-path=logs/nginx.pid \
