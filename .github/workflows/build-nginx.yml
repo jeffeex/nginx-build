@@ -50,7 +50,6 @@ jobs:
           cd nginx
           pwd
           ./configure \
-            --with-ld-opt="-L/ucrt64/lib -Wl,-Bstatic -lxslt -lxml2 -lz -llzma -liconv -Wl,-Bdynamic" \
             --prefix= \
             --conf-path=conf/nginx.conf \
             --pid-path=logs/nginx.pid \
@@ -89,6 +88,7 @@ jobs:
             --with-http_dav_module \
             --add-module=module/nginx-dav-ext-module
           make -j4
+          ldd objs/nginx.exe
       - name: Upload compiled binaries
         uses: actions/upload-artifact@v4
         with:
