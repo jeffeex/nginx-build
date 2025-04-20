@@ -42,6 +42,8 @@ jobs:
           cd module
           git clone https://github.com/arut/nginx-dav-ext-module.git
           ls -al
+          ls -al /ucrt64/include/
+          ls -al /ucrt64/lib
       - name: Configure and build Nginx
         shell: msys2 {0}
         run: |
